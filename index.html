@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CharlottieFit - Workout Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Inter:wght@400;500;700&display=swap');
+
+        /* Algemene body styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f3f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #e75480;
+            margin-bottom: 40px!important;
+        }
+
+        /* Dag buttons */
+        .day-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .day-buttons button {
+            flex: 1;
+            margin: 0 5px;
+            padding: 15px;
+            background-color: #fde9f0;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #e75480;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .day-buttons button.active {
+            background-color: #e75480;
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(231, 84, 128, 0.3);
+        }
+
+        /* Workout secties */
+        .workout {
+            display: none;
+        }
+
+        .workout.active {
+            display: block;
+        }
+
+        /* Workout item styling */
+        .workout-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fde9f0;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            font-size: 1.1em;
+            color: #be2855;
+        }
+
+        .workout-item.completed {
+            background-color: #e3fcec;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-decoration: line-through;
+            color: #6d6d6d;
+        }
+
+        /* Knoppen voor afvinken van oefeningen */
+        .workout-item button {
+  background-color: #e75480;
+  border: none;
+  padding: 11px 16px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-left: 8px;
+}
+
+        .workout-item button:hover {
+            background-color: #d43a66;
+            transform: scale(1.05);
+        }
+
+        /* Voltooi Dag knop */
+        .complete-day {
+            background-color: #e75480;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 30px;
+            width: 100%;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .complete-day:hover {
+            background-color: #d43a66;
+            box-shadow: 0 10px 30px rgba(231, 84, 128, 0.3);
+        }
+
+        /* Popup motiverende boodschap */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-inner {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-inner h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            color: #e75480;
+            margin-bottom: 20px;
+        }
+
+        .popup-inner p {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .popup-inner button {
+            background-color: #e75480;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .popup-inner button:hover {
+            background-color: #d43a66;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>CharlottieFit 🌸</h1>
+
+    <!-- Dag selecteren -->
+    <div class="day-buttons">
+        <button class="active" onclick="showWorkout('dayA')">Dag A</button>
+        <button onclick="showWorkout('dayB')">Dag B</button>
+        <button onclick="showWorkout('dayC')">Dag C</button>
+    </div>
+
+    <!-- Workouts voor Dag A -->
+    <div id="dayA" class="workout active">
+        <div class="workout-item">
+            🦵 Squats (3x10)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            💪 Push-ups tegen de muur (3x8)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            🏃‍♀️ Lunges (3x10 per been)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            🧘‍♀️ Plank (3x30 seconden)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            💁‍♀️ Tricep Dips met stoel (3x8)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <button class="complete-day" onclick="completeDay()">Voltooid 🌟</button>
+    </div>
+
+    <!-- Workouts voor Dag B -->
+    <div id="dayB" class="workout">
+        <div class="workout-item">
+            🏃‍♀️ Jumping Jacks (3x30 seconden)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            🧗‍♀️ Mountain Climbers (3x30 seconden)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            🔄 Russian Twists (3x15)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            🦵 High Knees (3x30 seconden)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            🚴‍♀️ Bicycle Crunches (3x15)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <button class="complete-day" onclick="completeDay()">Voltooid 🌟</button>
+    </div>
+
+    <!-- Workouts voor Dag C -->
+    <div id="dayC" class="workout">
+        <div class="workout-item">
+            🐱🐄 Cat-Cow Stretch (10 herhalingen)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            🐕 Downward Dog (30 seconden)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            🌳 Tree Pose (30 seconden per been)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            🧘‍♀️ Warrior Pose (30 seconden per kant)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <div class="workout-item">
+            👶 Child's Pose (1 minuut)
+            <button onclick="completeWorkout(this)">✔</button>
+        </div>
+        <button class="complete-day" onclick="completeDay()">Voltooid 🌟</button>
+    </div>
+</div>
+
+<!-- Pop-up Motiverende Bericht -->
+<div id="popup" class="popup">
+    <div class="popup-inner">
+        <h2>Fantastisch gedaan! 🌸</h2>
+        <p id="random-message"></p>
+        <button onclick="closePopup()">Sluiten</button>
+    </div>
+</div>
+
+<script>
+    function showWorkout(day) {
+        document.querySelectorAll('.workout').forEach(function(workout) {
+            workout.classList.remove('active');
+        });
+
+        document.getElementById(day).classList.add('active');
+
+        document.querySelectorAll('.day-buttons button').forEach(function(button) {
+            button.classList.remove('active');
+        });
+
+        document.querySelector('.day-buttons button[onclick="showWorkout(\'' + day + '\')"]').classList.add('active');
+    }
+
+    function completeWorkout(button) {
+        const workoutItem = button.parentElement;
+        workoutItem.classList.add('completed');
+        button.remove();
+    }
+
+    function completeDay() {
+        const messages = [
+    "Je hebt dat weer geweldig gedaan Charlottie! Amai, je gaat morgen zeer hebben! 😅",
+    "Wat een prestatie! Je wordt de Schwarzenegger van België 💪🇧🇪",
+    "Je hebt jezelf overtroffen! De Spice Girls hebben een nieuwe Sporty Spice gevonden! 🌶️",
+    "Tijd om even te ontspannen, Amandelnootje! Na deze workout heb je het echt verdiend. 🌟",
+    "Super gedaan! Je spieren kweken als konijnen 💥",
+    "Dat was echt indrukwekkend! Ik ben er zelf nie goed van, eet maar een koekje 🍪",
+    "Je hebt de fitnessgame gerockt, Amandelnootje! 🎸",
+    "Na deze workout mag je jezelf trakteren... misschien wel op een koekje, Koekje? 🍪",
+    "Arnold Schwarzenegger zou jaloers zijn op je workout vandaag, Amandelnootje! 💪😎",
+    "Je hebt jezelf overtroffen! Holy Guacamole Charlottie! 🔥",
+    "Fantastisch werk! Tijd om te relaxen, Koekje! Je hebt het verdiend. 😌",
+];
+
+
+        document.getElementById('random-message').innerText = messages[Math.floor(Math.random() * messages.length)];
+        document.getElementById('popup').style.display = 'flex';
+    }
+
+    function closePopup() {
+        document.getElementById('popup').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
